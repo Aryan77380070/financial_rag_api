@@ -1,40 +1,47 @@
-Financial Document Management API with Semantic Search 📊🧠
-A robust, enterprise-ready REST API built with FastAPI that allows organizations to securely store, manage, and analyze financial documents.
+Here is a complete, professional `README.md` file designed specifically for your GitHub repository. It covers the architecture, setup instructions, and explains the crucial pieces of code that make your AI-powered backend work.
 
-This project goes beyond standard file storage by implementing a complete Retrieval-Augmented Generation (RAG) pipeline. It uses local vector databases and open-source AI models (Bi-encoders and Cross-encoders) to perform highly accurate semantic searches across uploaded PDF documents (invoices, reports, contracts).
+You can copy and paste everything below this line directly into your `README.md` file.
 
-🚀 Tech Stack
-Backend Framework: FastAPI, Uvicorn
+---
 
-Database: PostgreSQL, SQLAlchemy (ORM)
+# Financial Document Management API with Semantic Search 📊🧠
 
-Authentication: JWT (JSON Web Tokens), passlib, bcrypt
+A robust, enterprise-ready REST API built with **FastAPI** that allows organizations to securely store, manage, and analyze financial documents.
 
-AI & NLP: LangChain, HuggingFace (all-MiniLM-L6-v2), Sentence-Transformers (ms-marco-MiniLM-L-6-v2)
+This project goes beyond standard file storage by implementing a complete **Retrieval-Augmented Generation (RAG)** pipeline. It uses local vector databases and open-source AI models (Bi-encoders and Cross-encoders) to perform highly accurate semantic searches across uploaded PDF documents (invoices, reports, contracts).
 
-Vector Database: ChromaDB (Local)
+## 🚀 Tech Stack
 
-Document Processing: PyPDF
+* **Backend Framework:** FastAPI, Uvicorn
+* **Database:** PostgreSQL, SQLAlchemy (ORM)
+* **Authentication:** JWT (JSON Web Tokens), `passlib`, `bcrypt`
+* **AI & NLP:** LangChain, HuggingFace (`all-MiniLM-L6-v2`), Sentence-Transformers (`ms-marco-MiniLM-L-6-v2`)
+* **Vector Database:** ChromaDB (Local)
+* **Document Processing:** PyPDF
 
-✨ Core Features
-Role-Based Access Control (RBAC): Secure endpoints restricted by user roles (Admin, Financial Analyst, Auditor, Client).
+---
 
-Relational Metadata Storage: Tracks document details (company name, uploader, timestamps) in PostgreSQL.
+## ✨ Core Features
 
-AI Document Ingestion: Automatically extracts text from uploaded PDFs, chunks it contextually, generates vector embeddings, and stores them in ChromaDB.
+1. **Role-Based Access Control (RBAC):** Secure endpoints restricted by user roles (Admin, Financial Analyst, Auditor, Client).
+2. **Relational Metadata Storage:** Tracks document details (company name, uploader, timestamps) in PostgreSQL.
+3. **AI Document Ingestion:** Automatically extracts text from uploaded PDFs, chunks it contextually, generates vector embeddings, and stores them in ChromaDB.
+4. **Two-Stage Semantic Search:** Uses a fast vector search to find the top 20 results, followed by a highly accurate AI reranking model to return the top 5 most relevant insights.
 
-Two-Stage Semantic Search: Uses a fast vector search to find the top 20 results, followed by a highly accurate AI reranking model to return the top 5 most relevant insights.
+---
 
-🛠️ Local Setup & Installation
-1. Prerequisites
-Python 3.10+
+## 🛠️ Local Setup & Installation
 
-PostgreSQL server running locally
+### 1. Prerequisites
 
-2. Environment Setup
+* Python 3.10+
+* PostgreSQL server running locally
+
+### 2. Environment Setup
+
 Clone the repository and create a virtual environment:
 
-Bash
+```bash
 git clone https://github.com/yourusername/financial-rag-api.git
 cd financial-rag-api
 python -m venv venv
@@ -43,37 +50,59 @@ python -m venv venv
 venv\Scripts\activate
 # Activate on macOS/Linux:
 source venv/bin/activate
+
+```
+
 Install the dependencies:
 
-Bash
+```bash
 pip install -r requirements.txt
-(Note: If you encounter an error with passlib hashing, ensure you are using bcrypt==3.2.2).
 
-3. Environment Variables
-Create a .env file in the root directory and configure your PostgreSQL connection and JWT secrets:
+```
 
-Code snippet
+*(Note: If you encounter an error with `passlib` hashing, ensure you are using `bcrypt==3.2.2`)*.
+
+### 3. Environment Variables
+
+Create a `.env` file in the root directory and configure your PostgreSQL connection and JWT secrets:
+
+```env
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/financial_db
 SECRET_KEY=your_super_secret_random_hex_key_here
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-4. Database Initialization
-Ensure you have created an empty database named financial_db in PostgreSQL. The FastAPI application will automatically generate the required tables on the first run.
 
-Bash
+```
+
+### 4. Database Initialization
+
+Ensure you have created an empty database named `financial_db` in PostgreSQL. The FastAPI application will automatically generate the required tables on the first run.
+
+```bash
 psql -U postgres
 CREATE DATABASE financial_db;
 \q
-5. Run the Server
-Bash
+
+```
+
+### 5. Run the Server
+
+```bash
 uvicorn app.main:app --reload
-Navigate to http://127.0.0.1:8000/docs to view the interactive Swagger UI and test the endpoints.
 
-📂 Architecture & Crucial Code Explanations
-1. Security & RBAC (app/auth.py)
-Security is handled via OAuth2 with Password Bearer tokens. We implemented a custom RoleChecker dependency to protect routes.
+```
 
-Python
+Navigate to `http://127.0.0.1:8000/docs` to view the interactive Swagger UI and test the endpoints.
+
+---
+
+## 📂 Architecture & Crucial Code Explanations
+
+### 1. Security & RBAC (`app/auth.py`)
+
+Security is handled via OAuth2 with Password Bearer tokens. We implemented a custom `RoleChecker` dependency to protect routes.
+
+```python
 # Crucial Code: Role-Based Access Control Dependency
 class RoleChecker:
     def __init__(self, allowed_roles: list[str]):
@@ -91,10 +120,14 @@ def delete_document(
     document_id: int, 
     current_user: models.User = Depends(RoleChecker(["Admin"])) 
 ):
-2. File Uploads & Relational Syncing (app/documents.py)
-When a document is uploaded, the physical PDF is saved to a local uploads/ directory, while its metadata is stored in PostgreSQL. This ensures our AI pipeline always has a physical file to read from.
 
-Python
+```
+
+### 2. File Uploads & Relational Syncing (`app/documents.py`)
+
+When a document is uploaded, the physical PDF is saved to a local `uploads/` directory, while its metadata is stored in PostgreSQL. This ensures our AI pipeline always has a physical file to read from.
+
+```python
 # Crucial Code: Handling Multipart Form Data
 @router.post("/upload")
 def upload_document(
@@ -112,10 +145,14 @@ def upload_document(
     new_doc = models.Document(title=title, company_name=company_name)
     db.add(new_doc)
     db.commit()
-3. AI Document Ingestion Pipeline (app/rag_core.py)
+
+```
+
+### 3. AI Document Ingestion Pipeline (`app/rag_core.py`)
+
 This is the heart of the RAG system. We extract text from PDFs, split it into overlapping chunks (so sentences aren't cut in half), embed them using HuggingFace, and save them to ChromaDB.
 
-Python
+```python
 # Crucial Code: Text Chunking and Embedding
 def process_and_index_document(document_id: int, file_path: str, metadata: dict):
     loader = PyPDFLoader(file_path)
@@ -136,10 +173,14 @@ def process_and_index_document(document_id: int, file_path: str, metadata: dict)
     # Save to local Vector Database
     vectorstore = Chroma(persist_directory="chroma_db", embedding_function=HuggingFaceEmbeddings())
     vectorstore.add_documents(chunks)
-4. Advanced Two-Stage Retrieval (app/rag_core.py)
+
+```
+
+### 4. Advanced Two-Stage Retrieval (`app/rag_core.py`)
+
 To provide the highest accuracy possible, the search endpoint uses a Bi-Encoder to fetch the top 20 results instantly, and then a heavy Cross-Encoder to read the context deeply and rank the top 5.
 
-Python
+```python
 # Crucial Code: Semantic Search & Reranking
 reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
@@ -159,16 +200,19 @@ def retrieve_and_rerank(query: str):
     scored_results.sort(key=lambda x: x[1], reverse=True)
     
     return scored_results[:5]
-🚀 Deployment Instructions
-This application requires persistent storage for the uploads/ and chroma_db/ folders.
+
+```
+
+---
+
+## 🚀 Deployment Instructions
+
+This application requires persistent storage for the `uploads/` and `chroma_db/` folders.
 
 If deploying to a PaaS like Render or Railway:
 
-Provision a managed PostgreSQL database.
-
-Deploy the FastAPI code as a Web Service.
-
-Crucial: Attach a Persistent Disk to your web service and map it to your storage directories to ensure files and AI embeddings survive server restarts.
-
-Update the start command to use Gunicorn:
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
+1. Provision a managed PostgreSQL database.
+2. Deploy the FastAPI code as a Web Service.
+3. **Crucial:** Attach a Persistent Disk to your web service and map it to your storage directories to ensure files and AI embeddings survive server restarts.
+4. Update the start command to use Gunicorn:
+`gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app`
