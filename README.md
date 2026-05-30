@@ -1,9 +1,3 @@
-Here is a complete, professional `README.md` file designed specifically for your GitHub repository. It covers the architecture, setup instructions, and explains the crucial pieces of code that make your AI-powered backend work.
-
-You can copy and paste everything below this line directly into your `README.md` file.
-
----
-
 # Financial Document Management API with Semantic Search 📊🧠
 
 A robust, enterprise-ready REST API built with **FastAPI** that allows organizations to securely store, manage, and analyze financial documents.
